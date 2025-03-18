@@ -32,6 +32,24 @@ class SalidaArchivo implements EstrategiaSalida {
     }
 }
 
+// Estrategia para salida en CSV
+class SalidaCSV implements EstrategiaSalida {
+    private string $archivo;
+
+    public function __construct(string $archivo = "mensaje.csv") {
+        $this->archivo = $archivo;
+    }
+
+    public function mostrar(string $mensaje): void {
+        $fila = [$mensaje];
+        $archivo = fopen($this->archivo, "a"); // Abrir en modo append
+        fputcsv($archivo, $fila, ",", '"', "\\"); // Se añade el parámetro de escape
+        fclose($archivo);
+
+        echo "Archivo CSV: Mensaje guardado en '{$this->archivo}'" . PHP_EOL;
+    }
+}
+
 // Contexto que usa la estrategia elegida
 class Mensajero {
     private EstrategiaSalida $estrategia;
@@ -60,5 +78,8 @@ $mensajero->setEstrategia(new SalidaJSON());
 $mensajero->enviarMensaje($mensaje);
 
 $mensajero->setEstrategia(new SalidaArchivo("salida.txt"));
+$mensajero->enviarMensaje($mensaje);
+
+$mensajero->setEstrategia(new SalidaCSV("salida.csv"));
 $mensajero->enviarMensaje($mensaje);
 ?>
